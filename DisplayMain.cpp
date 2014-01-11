@@ -5,13 +5,14 @@
 #include "Parser.h"
 #include "Tracker.h"
 #include "DS18B20.h"
+#include "Config.h"
 
 // ---------------- constant definitions ----------------
 
 const unsigned long BAUD = 115200;
 
-const uint8_t WIDTH = 16;
-const uint8_t HEIGHT = 2;
+const uint8_t HEIGHT = 2; 
+const uint8_t WIDTH = Tracker::WIDTH;
 
 const uint8_t RS_PIN = 2;
 const uint8_t RW_PIN = 3;
@@ -59,7 +60,7 @@ TimeoutLed receiveLed(RECEIVE_LED_PIN);
 ActionButton leftButton(LEFT_BUTTON_PIN);
 ActionButton rightButton(RIGHT_BUTTON_PIN);
 Parser parser(WIDTH);
-Tracker tracker("0123456789PRUWBCDT", WIDTH);
+Tracker tracker;
 DS18B20 ds18b20(DS18B20_PIN);
 
 //------- DUMP STATE -------
@@ -111,6 +112,10 @@ const char DUMP_REGULAR = 0;
 const char DUMP_FIRST = HIGHLIGHT_CHAR;
 
 char* makeDump(char dumpType) {
+  // prepare this display tag
+  char tag = config.thisDisplayTag.read();
+  if (tracker.indexOfTag(tag) >= 0)
+    dumpLine[1] = tag;
   // prepare temperature
   DS18B20::temp_t temp = ds18b20.value();
   if (temp.valid())

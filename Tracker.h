@@ -3,7 +3,11 @@
 
 #include <Arduino.h>
 
-class Tracker {
+class Tracker {         
+  public:
+    static const int8_t N_TAGS = 36;
+    static const int8_t WIDTH = 16;
+
   private:
     enum Mode {
       MODE_REGULAR = 0,
@@ -11,13 +15,10 @@ class Tracker {
       MODE_MANUAL = 0xff
     };
 
-    uint8_t        _n;
-    uint8_t        _width;
-    char*          _modules;
-    unsigned long* _receive_time;
-    char*          _last_buf;
-    int8_t*        _last_queue;
-    boolean*       _in_queue;
+    unsigned long  _receive_time[N_TAGS];
+    char           _last_buf[N_TAGS * WIDTH];
+    int8_t         _last_queue[N_TAGS + 1];
+    boolean        _in_queue[N_TAGS];
     uint8_t        _queue_head;
     uint8_t        _queue_tail;
     
@@ -32,8 +33,9 @@ class Tracker {
     void getLast(char* buf, int8_t i);
 
   public:
-    Tracker(char* modules, uint8_t width);
+    Tracker();
 
+    int8_t indexOfTag(char c);
     int8_t process(char* buf, uint8_t urgent);
     void move(int8_t direction);
 
