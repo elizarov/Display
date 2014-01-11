@@ -56,7 +56,7 @@ TimeoutLed receiveLed(RECEIVE_LED_PIN);
 ActionButton leftButton(LEFT_BUTTON_PIN);
 ActionButton rightButton(RIGHT_BUTTON_PIN);
 Parser parser(WIDTH);
-Tracker tracker("0123456789PRUWBCD", WIDTH);
+Tracker tracker("0123456789PRUWBCDT", WIDTH);
 DS18B20 ds18b20(DS18B20_PIN);
 
 //------- DUMP STATE -------
