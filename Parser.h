@@ -7,7 +7,7 @@
 // ... [ ... : ... ;  ... ] ... [*]\r\n
 //  |     |     |      |     |   |    |
 //  |     |     |      |     |   |    +- STATE_0D
-//  |     |     |      |     |   +- urgent?
+//  |     |     |      |     |   +- urgent
 //  |     |     |      |     +- STATE_OVER
 //  |     |     |      +- STATE_BODY_REST
 //  |     |     +- STATE_BODY
@@ -28,8 +28,7 @@ class Parser {
 
     uint8_t       _width;
     State         _state;
-    char          _prev;
-    boolean       _urgent;
+    uint8_t       _urgent;
     char*         _buf;
     uint8_t       _size;
 
@@ -38,10 +37,10 @@ class Parser {
   
     boolean parse(char c);
     char* buffer();
-    boolean urgent();
+    uint8_t urgent();
 };
 
-inline boolean Parser::urgent() {
+inline uint8_t Parser::urgent() {
   return _urgent;
 }
 

@@ -48,6 +48,9 @@ const unsigned long BOOT_TONE_DURATION = 300;
 const unsigned int URGENT_TONE_FREQUENCY = 1500;
 const unsigned long URGENT_TONE_DURATION = 300;
 
+const unsigned int URGENT2_TONE_FREQUENCY = 2000;
+const unsigned long URGENT2_TONE_DURATION = 1000;
+
 // ---------------- object definitions ----------------
 
 LCDLog lcd(RS_PIN, RW_PIN, EN_PIN, D4_PIN, D5_PIN, D6_PIN, D7_PIN, WIDTH, HEIGHT);
@@ -169,42 +172,55 @@ void setup() {
   lcd.println(ds18b20.value().valid() ? F("OK") : F("FAIL"));
 }
 
-void process(char* buf, boolean urgent, int8_t cursor) {
-  if (!buf)
-    return;
-  receiveLed.light(RECEIVE_LED_INTERVAL);
-  int8_t received = tracker.process(buf, urgent);
-  if (received >= 0 && urgent)
-    tone(SPEAKER_PIN, URGENT_TONE_FREQUENCY, URGENT_TONE_DURATION);
-  if (cursor < 0 || received == cursor || urgent) {
+inline void processButtons() {
+  if (leftButton.check())
+    tracker.move(-1);
+  if (rightButton.check())
+    tracker.move(1);
+}
+
+inline void updateLCD() {
+  char buf[WIDTH + 1];  
+  // print 1st (message) line
+  if (tracker.message(buf)) {
     lcd.setCursor(0, 0);
+    lcd.print(buf);
+    lcd.clearToRight();
+  }
+  // print 2nd (status) line
+  if (tracker.status(buf)) {
+    lcd.setCursor(0, 1);
     lcd.print(buf);
     lcd.clearToRight();
   }
 }
 
-void loop() {
-  if (leftButton.check())
-    tracker.move(-1);
-  if (rightButton.check())
-    tracker.move(1);
-  char buf[WIDTH + 1];  
-  int8_t cursor = tracker.status(buf);
-  if (cursor >= 0) {
-    lcd.setCursor(0, 0);
-    lcd.print(tracker.last(cursor));
-    lcd.clearToRight();
-  }
-  lcd.setCursor(0, 1);
-  lcd.print(buf);
-  lcd.clearToRight();
+void process(char* buf, uint8_t urgent) {
+  if (!buf)
+    return; // no message
+  int8_t received = tracker.process(buf, urgent);
+  if (received < 0)
+    return; // not tracked message
+  receiveLed.light(RECEIVE_LED_INTERVAL);
+  if (urgent > 1)
+    tone(SPEAKER_PIN, URGENT2_TONE_FREQUENCY, URGENT2_TONE_DURATION);
+  else if (urgent > 0)  
+    tone(SPEAKER_PIN, URGENT_TONE_FREQUENCY, URGENT_TONE_DURATION);
+}
+
+inline void parseSerialInput() {
   while (Serial.available()) {
-    if (parser.parse(Serial.read())) {
-      process(parser.buffer(), parser.urgent(), cursor);
-    }
+    if (parser.parse(Serial.read()))
+      process(parser.buffer(), parser.urgent());
   }
+}
+
+void loop() {
+  processButtons();
+  updateLCD();
+  parseSerialInput();
   ds18b20.read();
-  process(dumpState(), false, cursor);
+  process(dumpState(), 0);
   blinkLed.blink(tracker.urgent() ? URGENT_BLINK_INTERVAL : REGULAR_BLINK_INTERVAL);
   receiveLed.check();
 }

@@ -15,9 +15,9 @@ boolean Parser::parse(char c) {
     break;
   case ']':
     _state = _state == STATE_BODY || _state == STATE_BODY_REST ? STATE_OVER : STATE_OUT;
+    _urgent = 0; // will count trailing '*' in STATE_OVER
     break;
   case '\r':
-    _urgent = _prev == '*';
     _state = _state == STATE_OVER ? STATE_0D : STATE_OUT;
     break;
   case '\n':
@@ -48,6 +48,12 @@ boolean Parser::parse(char c) {
       else
         append = true;
       break;
+    case STATE_OVER:
+      if (c == '*')
+        _urgent++;
+      else
+        _urgent = 0;
+      break;  
     case STATE_0D:
       _state = STATE_OUT; // anything but '\n' was seen after '\r'
       break;
@@ -55,7 +61,6 @@ boolean Parser::parse(char c) {
   }
   if (append && _size < _width)
     _buf[_size++] = c;
-  _prev = c;
   return false;
 }
  
