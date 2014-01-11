@@ -38,8 +38,6 @@ const uint8_t LIGHT_SENSOR_PIN = A0;
 const uint8_t DS18B20_PIN = A1;
 const uint8_t SPEAKER_PIN = A2;
 
-const int DS18B20_CORRECTION = 350; // +3.5 degrees Celsium from the ambient temp
-
 const unsigned long INITIAL_DUMP_INTERVAL = 2000L;   // 2 sec
 const unsigned long PERIODIC_DUMP_INTERVAL = 60000L; // 1 min
 const unsigned long PERIODIC_DUMP_SKEW = 5000L;      // 5 sec 
@@ -113,7 +111,7 @@ char* makeDump(char dumpType) {
   // prepare temperature
   DS18B20::temp_t temp = ds18b20.value();
   if (temp.valid())
-    prepareTemp1(temp.mantissa() - DS18B20_CORRECTION, tempPos, tempSize);
+    prepareTemp1(temp, tempPos, tempSize);
     
   // prepare light 
   prepareDecimal(analogRead(LIGHT_SENSOR_PIN), lightPos, lightSize);  
