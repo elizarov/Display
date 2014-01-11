@@ -42,11 +42,11 @@ const unsigned long INITIAL_DUMP_INTERVAL = 2000L;   // 2 sec
 const unsigned long PERIODIC_DUMP_INTERVAL = 60000L; // 1 min
 const unsigned long PERIODIC_DUMP_SKEW = 5000L;      // 5 sec 
 
-const unsigned int BOOT_TONE_FREQUENCY = 2000;
-const unsigned long BOOT_TONE_DURATION = 500;
+const unsigned int BOOT_TONE_FREQUENCY = 1000;
+const unsigned long BOOT_TONE_DURATION = 300;
 
-const unsigned int URGENT_TONE_FREQUENCY = 1000;
-const unsigned long URGENT_TONE_DURATION = 500;
+const unsigned int URGENT_TONE_FREQUENCY = 1500;
+const unsigned long URGENT_TONE_DURATION = 300;
 
 // ---------------- object definitions ----------------
 
